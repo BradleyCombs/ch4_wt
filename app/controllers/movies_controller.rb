@@ -15,9 +15,8 @@ class MoviesController < ApplicationController
     end
     
     def create
-        params.require(:movie).permit(:title,:rating,:description,:release_date)
-        # rest of code...
-        @movie = Movie.create!(params[:movie].permit(:title,:rating,:description,:release_date))
+        #@movie = Movie.create!(params[:movie]) #old way
+        @movie = Movie.create!(movie_params) # new way
         flash[:notice] = "#{@movie.title} was successfully created."
         redirect_to movies_path
     end
@@ -25,14 +24,13 @@ class MoviesController < ApplicationController
     def edit
         @movie = Movie.find params[:id]
     end
-    
+
     def update
         @movie = Movie.find params[:id]
-        @movie.update_attributes!(params[:movie])
-        respond_to do |client_wants|
-            client_wants.html {  redirect_to movie_path(@movie)  } # as before
-            client_wants.xml  {  render :xml => @movie.to_xml    }
-        end
+        #@movie.update_attributes!(params[:movie]) # old way
+        @movie.update_attributes!(movie_params) # new way
+        flash[:notice] = "#{@movie.title} was successfully updated."
+        redirect_to movie_path(@movie)
     end
 
     def destroy
@@ -40,5 +38,10 @@ class MoviesController < ApplicationController
         @movie.destroy
         flash[:notice] = "Movie '#{@movie.title}' deleted."
         redirect_to movies_path
+    end
+    
+    private
+    def movie_params
+        params.require(:movie).permit(:title, :rating, :description, :release_date)
     end
 end
